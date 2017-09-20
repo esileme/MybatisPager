@@ -1,0 +1,31 @@
+<!DOCTYPE configuration
+    PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<!-- 指定Mybatis使用log4j -->
+	<settings>
+		<setting name="logImpl" value="LOG4J" />
+	</settings>
+
+	<typeAliases>
+		<package name="com.yl.page.model" />
+	</typeAliases>
+
+
+		<plugins>
+			<!-- com.github.pagehelper为PageHelper类所在包名 -->
+			<plugin interceptor="com.github.pagehelper.PageInterceptor">
+				<!-- 使用下面的方式配置参数，后面会有所有的参数介绍 -->
+				<property name="helperDialect" value="mysql" />
+				<property name="reasonable" value="true" />
+				<property name="supportMethodsArguments" value="true" />
+				<property name="autoRuntimeDialect" value="true" />
+	
+			</plugin>
+	
+			<!-- 配置Mybatis的拦截机制，可以拦截ParameterHandler、ResultSetHandler、StatementHandler、Executor的操作 -->
+			<plugin interceptor="com.yl.page.intercpter.CameHumpIntercpter"></plugin>
+	
+	
+		</plugins>
+</configuration>

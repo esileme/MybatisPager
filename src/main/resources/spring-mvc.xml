@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/mvc 
+		http://www.springframework.org/schema/mvc/spring-mvc.xsd 
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<description>Spring MVC Configuration</description>
+
+	<!-- 使用Annotation自动注册Bean,只扫描@Controller use-default-filters="true" 默认扫描指定包下的全部 
+		@Component(@Controller/@Service/@Repository), exclude-filter 指定的不扫描，include-filter指定的扫描， 
+		include-filter和exclude-filter 没有指定的仍然扫描，假設一個service被掃描兩次，有可能導致事物失效 use-default-filters="false" 
+		include-filter指定的扫描 ,其他沒有指定的不扫描 -->
+	<context:component-scan base-package="com.yl.page.controller"
+		use-default-filters="false"><!-- base-package 如果多个，用“,”分隔 -->
+		<context:include-filter type="annotation"
+			expression="org.springframework.stereotype.Controller" />
+	</context:component-scan>
+
+	<!-- 註解驅動 會加載 1 RequestMappingHandlerMapping 2 BeanNameUrlHandlerMapping 
+		3 RequestMappingHandlerAdapter 4 HttpRequestHandlerAdapter 5 SimpleControllerHandlerAdapter 
+		6 ExceptionHandlerExceptionResolver 7 ResponseStatusExceptionResolver 8 DefaultHandlerExceptionResolver 
+		1 2: 是HandlerMapping接口的实现类，用来处理请求映射的。其中第一个是处理处理请求映射的，处理@RequestMapping跟请求地址之间的关系 
+		3 4 5:是用来处理请求的。具体点说就是确定调用哪个controller的哪个方法来处理当前请求。第一个处理@Controller注解的处理器，支持自定义方法参数和返回值） 
+		RequestMappingHandlerAdapter是请求处理的适配器，也就是请求之后处理具体逻辑的执行，关系到哪个类的哪个方法以及转换器等工作。 
+		第二个是处理继承HttpRequestHandler的处理器。 第三个处理继承自Controller接口的处理器 6 7 8:是用来处理异常的解析器。 -->
+
+
+	<!-- 配置校验器 -->
+	<bean id="validator"
+		class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+		<!-- 校验器，使用hibernate校验器 -->
+		<property name="providerClass" value="org.hibernate.validator.HibernateValidator" />
+		<!-- 指定校验使用的资源文件，在文件中配置校验错误信息，如果不指定则默认使用classpath下面的ValidationMessages.properties文件 -->
+		<property name="validationMessageSource" ref="validatemessageSource" />
+	</bean>
+
+	<bean id="validatemessageSource"
+		class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basename" value="classpath:CustomValidationMessage" />
+		<property name="fileEncodings" value="utf-8" />
+		<property name="cacheSeconds" value="120" />
+	</bean>
+
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer">
+		<property name="location">
+			<value>classpath:file.properties</value>
+		</property>
+	</bean>
+
+	<mvc:annotation-driven validator="validator" />
+
+
+	<!-- 检查员，对进入DispatcherServlet的URL进行筛查，如果发现是静态资源的请求，就将该请求转由Web应用服务器默认的Servlet处理， 
+		如果不是静态资源的请求，才由DispatcherServlet继续处理，這是静态资源不攔截的一種方式 還有其他方式，比如我們可以把DispatcherServlet 
+		的攔截路徑設置為*.do 而不是/ 當然，如果你不想設置為.do 的形式(优雅REST风格的资源URL不希望带 .html 或 .do 等后缀,带后缀的URL，而无法采用真正的REST风格的URL) 
+		你也有另一種方式去處理静态资源不攔截 <mvc:resources location="/,classpath:/META-INF/publicResources/" 
+		mapping="/resources/**"/> 以上配置将Web根路径"/"及类路径下 /META-INF/publicResources/ 
+		的目录映射为/resources路径。假设Web根路径下拥有images、js这两个资源目录,在images下面有bg.gif图片，在js下面有test.js文件，则可以通过 
+		/resources/images/bg.gif 和 /resources/js/test.js 访问这二个静态资源。 假设WebRoot还拥有images/bg1.gif 
+		及 js/test1.js，则也可以在网页中通过 /resources/images/bg1.gif 及 /resources/js/test1.js 
+		进行引用 -->
+
+	<mvc:default-servlet-handler />
+
+	<!-- 对模型视图名称的解析，在请求时模型视图名称添加前后缀 -->
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/view/" />
+		<property name="suffix" value=".jsp" />
+		<property name="viewClass"
+			value="org.springframework.web.servlet.view.JstlView" />
+	</bean>
+	<!-- 文件上传解析器 -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="104857600" />
+		<property name="maxInMemorySize" value="4096" />
+		<property name="defaultEncoding" value="UTF-8"></property>
+	</bean>
+	<!-- Shiro提供了相应的注解用于权限控制，如果使用这些注解就需要使用AOP的功能来进行判断，如Spring AOP； 开启Shiro Spring 
+		AOP权限注解的支持；<aop:config proxy-target-class="true">表示代理类 -->
+
+	<aop:config proxy-target-class="true"></aop:config>
+
+
+
+</beans>
