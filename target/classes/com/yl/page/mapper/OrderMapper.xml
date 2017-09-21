@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yl.page.mapper.OrderMapper">
+
+
+
+	<resultMap type="java.util.Map" id="itemMap">
+		<result column="title" property="title" />
+		<result column="price" property="price" />
+	</resultMap>
+
+
+		<resultMap type="java.util.Map" id="fatherMap">
+			<result column="orderId" property="orderId" />
+			<result column="payment" property="payment" />
+			<result column="buyer_nick" property="buyerNick" />
+			<result column="shipping_code" property="shippingCode" />
+			<result column="state" property="state" />
+		</resultMap>
+	
+		<resultMap type="java.util.Map" id="orderMap" extends="fatherMap">
+	
+			<collection property="items" javaType="ArrayList" resultMap="itemMap" />
+	
+		</resultMap>
+	
+		<select id="getOrdersByUserId" resultMap="orderMap">
+	
+			SELECT o.order_id AS orderId,o.payment ,o.buyer_nick,o.shipping_code
+			,o.status AS orderState,i.title ,i.price FROM tb_order AS o,tb_item AS
+			i,tb_order_item AS oi WHERE o.user_id=#{userId} AND
+			oi.order_id=o.order_id AND i.id=oi.item_id
+	
+		</select>
+
+
+
+
+
+
+	<select id="getAnotherOrdersByUserId" resultMap="fatherMap">
+
+		SELECT o.order_id AS orderId,o.payment ,o.buyer_nick,o.shipping_code
+		,o.status AS orderState FROM tb_order AS o WHERE o.user_id=#{userId}
+
+	</select>
+
+
+	<select id="getItems" resultMap="itemMap">
+
+		SELECT item.title ,item.price FROM tb_order_item AS oi ,tb_item AS item
+		WHERE oi.order_id=#{orderId} AND oi.item_id=item.id
+
+	</select>
+
+
+
+
+</mapper>

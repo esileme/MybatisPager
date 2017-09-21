@@ -9,4 +9,6 @@ public interface TestService {
 
 	//PageInfo<Map<String, Object>> getItems();
 	List<Map<String, Object>> getItems(Integer page,Integer pageSize);
+	List<Map<String, Object>> getOrdersByUserId(String userId);
+	List<Map<String, Object>> getAnotherOrdersByUserId(String userId);
 }

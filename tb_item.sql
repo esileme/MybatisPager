@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50717
 File Encoding         : 65001
 
-Date: 2017-09-20 21:18:17
+Date: 2017-09-21 16:24:57
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -974,3 +974,70 @@ INSERT INTO `tb_item` VALUES ('1356535', '【联通赠费版】三星 Galaxy S5 
 INSERT INTO `tb_item` VALUES ('1356541', '【联通赠费版】三星 Galaxy S5 (G9006W) 流光金 联通4G手机 双卡双待', '', '279900', '99999', null, 'http://image.e3mall.cn/jd/3bbeb6446b3f404989011b76c726b936.jpg', '560', '1', '2015-03-08 21:33:18', '2015-03-08 21:33:18');
 INSERT INTO `tb_item` VALUES ('1356546', '【联通赠费版】三星 Galaxy S5 (G9006W) 酷碳黑 联通4G手机 双卡双待', '', '279900', '99999', null, 'http://image.e3mall.cn/jd/a398075562424085bb5803a74a4a8b18.jpg', '560', '1', '2015-03-08 21:33:18', '2015-03-08 21:33:18');
 INSERT INTO `tb_item` VALUES ('1369278', '【联通合约惠机】小米 红米Note 增强版 象牙白 联通4G手机', '红米NOTE + 千元话费 = 超值合约惠机强势来袭！含1199元话费！', '89900', '99999', null, 'http://image.e3mall.cn/jd/070de62bbd8a43d38f9a321df38591af.jpg', '560', '1', '2015-03-08 21:33:48', '2015-03-08 21:33:48');
+
+-- ----------------------------
+-- Table structure for `tb_order`
+-- ----------------------------
+DROP TABLE IF EXISTS `tb_order`;
+CREATE TABLE `tb_order` (
+  `order_id` varchar(50) COLLATE utf8_bin NOT NULL DEFAULT '' COMMENT '订单id',
+  `payment` varchar(50) COLLATE utf8_bin DEFAULT NULL COMMENT '实付金额。精确到2位小数;单位:元。如:200.07，表示:200元7分',
+  `payment_type` int(2) DEFAULT NULL COMMENT '支付类型，1、在线支付，2、货到付款',
+  `post_fee` varchar(50) COLLATE utf8_bin DEFAULT NULL COMMENT '邮费。精确到2位小数;单位:元。如:200.07，表示:200元7分',
+  `status` int(10) DEFAULT NULL COMMENT '状态：1、未付款，2、已付款，3、未发货，4、已发货，5、交易成功，6、交易关闭',
+  `create_time` datetime DEFAULT NULL COMMENT '订单创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '订单更新时间',
+  `payment_time` datetime DEFAULT NULL COMMENT '付款时间',
+  `consign_time` datetime DEFAULT NULL COMMENT '发货时间',
+  `end_time` datetime DEFAULT NULL COMMENT '交易完成时间',
+  `close_time` datetime DEFAULT NULL COMMENT '交易关闭时间',
+  `shipping_name` varchar(20) COLLATE utf8_bin DEFAULT NULL COMMENT '物流名称',
+  `shipping_code` varchar(20) COLLATE utf8_bin DEFAULT NULL COMMENT '物流单号',
+  `user_id` bigint(20) DEFAULT NULL COMMENT '用户id',
+  `buyer_message` varchar(100) COLLATE utf8_bin DEFAULT NULL COMMENT '买家留言',
+  `buyer_nick` varchar(50) COLLATE utf8_bin DEFAULT NULL COMMENT '买家昵称',
+  `buyer_rate` int(2) DEFAULT NULL COMMENT '买家是否已经评价',
+  PRIMARY KEY (`order_id`),
+  KEY `create_time` (`create_time`),
+  KEY `buyer_nick` (`buyer_nick`),
+  KEY `status` (`status`),
+  KEY `payment_type` (`payment_type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- ----------------------------
+-- Records of tb_order
+-- ----------------------------
+INSERT INTO `tb_order` VALUES ('1', '7180', '1', '23', '3', '2017-09-20 14:44:43', '2017-09-20 14:44:48', '2017-09-21 14:44:52', '2017-09-21 14:44:55', '2017-09-21 14:44:59', '2017-09-23 14:45:04', '顺丰', '12345564', '1', '快点啊', '张三', '1');
+INSERT INTO `tb_order` VALUES ('2', '154680', '1', '23', '3', '2017-09-20 15:04:42', '2017-09-21 15:04:45', '2017-09-21 15:04:52', '2017-09-14 15:04:55', '2017-09-21 15:04:59', '2017-09-27 15:05:02', '顺丰', '12312', '1', '快快快', '张三', '1');
+INSERT INTO `tb_order` VALUES ('3', '149700', '1', '23', '3', '2017-09-20 15:06:28', '2017-09-21 15:06:33', '2017-09-21 15:06:36', '2017-09-21 15:06:39', '2017-09-21 15:06:42', '2017-09-21 15:06:46', '邮政', '3454566575', '1', '预估', '张三', '1');
+INSERT INTO `tb_order` VALUES ('4', '95800', '1', '45', '3', '2017-09-20 15:10:31', '2017-09-21 15:10:36', '2017-09-21 15:10:40', '2017-09-22 15:10:43', '2017-09-21 15:10:47', '2017-09-21 15:10:51', '顺丰', '343534', '1', '大师傅', '张三', '1');
+
+-- ----------------------------
+-- Table structure for `tb_order_item`
+-- ----------------------------
+DROP TABLE IF EXISTS `tb_order_item`;
+CREATE TABLE `tb_order_item` (
+  `id` varchar(20) COLLATE utf8_bin NOT NULL,
+  `item_id` varchar(50) COLLATE utf8_bin NOT NULL COMMENT '商品id',
+  `order_id` varchar(50) COLLATE utf8_bin NOT NULL COMMENT '订单id',
+  `num` int(10) DEFAULT NULL COMMENT '商品购买数量',
+  `title` varchar(200) COLLATE utf8_bin DEFAULT NULL COMMENT '商品标题',
+  `price` bigint(50) DEFAULT NULL COMMENT '商品单价',
+  `total_fee` bigint(50) DEFAULT NULL COMMENT '商品总金额',
+  `pic_path` varchar(200) COLLATE utf8_bin DEFAULT NULL COMMENT '商品图片地址',
+  PRIMARY KEY (`id`),
+  KEY `item_id` (`item_id`),
+  KEY `order_id` (`order_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- ----------------------------
+-- Records of tb_order_item
+-- ----------------------------
+INSERT INTO `tb_order_item` VALUES ('1', '536563', '1', '1', 'new2 - 阿尔卡特 (OT-927) 炭黑 联通3G手机 双卡双待', '2990', '2990', null);
+INSERT INTO `tb_order_item` VALUES ('2', '562379', '1', '1', '而非', '1100', '1100', null);
+INSERT INTO `tb_order_item` VALUES ('3', '605616', '1', '1', '扔', '3090', '3090', null);
+INSERT INTO `tb_order_item` VALUES ('4', '635906', '2', '2', '王夫人', '2490', '4980', null);
+INSERT INTO `tb_order_item` VALUES ('5', '679532', '2', '3', '偶偶', '49900', '149700', null);
+INSERT INTO `tb_order_item` VALUES ('6', '844022', '3', '1', '一天天粉色人', '299900', '299900', null);
+INSERT INTO `tb_order_item` VALUES ('7', '847276', '4', '1', '突然还有人', '48900', '48900', null);
+INSERT INTO `tb_order_item` VALUES ('8', '847278', '4', '1', 'afresh', '46900', '46900', null);
