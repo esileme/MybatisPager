@@ -24,6 +24,32 @@ http://www.springframework.org/schema/tx/spring-tx.xsd">
 			expression="org.springframework.stereotype.Controller" />
 	</context:component-scan>
 
+	<!-- 配置作业类 -->
+	<bean id="job1"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<bean class="com.yl.page.job.ShowTimeJob" />
+		</property>
+		<property name="targetMethod" value="showTime" />
+		<property name="concurrent" value="true" /><!-- 作业并发调度 -->
+	</bean>
 
+	<!-- CronTriggerBean，支持到指定时间运行一次，如每天12:00运行一次等。 -->
+	<bean id="cronTrigger"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="job1" />
+		<!-- 0 36 20 * * ? -->
+		<!-- Cron生成器网址：http://cron.qqe2.com/ -->
+		<property name="cronExpression" value="10/5 * * * * ?" />
+	</bean>
+
+		<!-- 配置工厂类 -->
+		<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+			<property name="triggers">
+				<list>
+					<ref bean="cronTrigger" />
+				</list>
+			</property>
+		</bean>
 
 </beans>
